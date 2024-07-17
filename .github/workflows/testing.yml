@@ -1,0 +1,12 @@
+name: Tast App
+on: push
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get repository
+        uses: actions/checkout@v4
+      - name: setup dependencies
+        run: npm ci
+      - name: run tests
+        run: npm run test
