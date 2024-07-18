@@ -39,5 +39,5 @@ jobs:
           CR_REPOSITORY: shri-infra
           IMAGE_TAG: ${{ github.run_number }}
         run: |
-          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG -f ./Dockerfile.shir-infra .
           docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
