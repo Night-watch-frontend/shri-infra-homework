@@ -1,4 +1,4 @@
-name: Tast App
+name: Test App
 on: push
 jobs:
   testing:

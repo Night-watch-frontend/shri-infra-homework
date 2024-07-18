@@ -1,0 +1,48 @@
+name: deploy
+on: [workflow_dispatch]
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get repository
+        uses: actions/checkout@v4
+      - name: setup dependencies
+        run: npm ci
+      - name: run tests
+        run: npm run test
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get repository
+        uses: actions/checkout@v4
+      - name: setup dependencies
+        run: npm ci
+      - name: run lint
+        run: npm run lint
+  Checkout-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get repository
+        uses: actions/checkout@v4
+      - name: Create release branch
+        run: |
+          git checkout -b releases/${{ github.run_number }}
+  Build-and-push-image-to-Yandex-Cloud-Container-Registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get repository
+        uses: actions/checkout@v4
+      - name: Login to Yandex Cloud Container Registry
+        id: login-cr
+        uses: yc-actions/yc-cr-login@v2
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+      - name: Build, tag, and push image to Yandex Cloud Container Registry
+        env:
+          CR_REGISTRY: crp54rf5t5acteh3vcdt
+          CR_REPOSITORY: shri-infra
+          IMAGE_TAG: ${{ github.run_number }}
+        run: |
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
