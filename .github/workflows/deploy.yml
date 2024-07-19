@@ -27,12 +27,10 @@ jobs:
           git checkout main
           git tag v${{ github.run_number }}
           git push origin v${{ github.run_number }}
-      - name: Get commit messages
-        id: get_commits
+      - name: Get release commit range
+        id: commit_range
         run: |
-          latest_tag=$(git describe --tags --abbrev=0)
-          commits=$(git log $latest_tag..HEAD --pretty=format:'- %s')
-          echo "commits=$commits" >> $GITHUB_ENV
+          echo "COMMIT_RANGE=git log $latest_tag..HEAD --pretty=format:"- %s"" >> $GITHUB_OUTPUT
       - name: Create an issue
         env:
           COMMIT_RANGE: ${{steps.commit_range.outputs.COMMIT_RANGE}}
@@ -45,7 +43,7 @@ jobs:
              - *Author:* ${{ github.actor }}
             - *Version:* ${{ github.run_number }}
             - *Commits:*
-            $commits
+            ${{env.COMMIT_RANGE}}
             - *Docker Image:* cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:v${{ github.run_number }}
 
       - name: Update CHANGELOG
