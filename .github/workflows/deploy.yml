@@ -31,7 +31,7 @@ jobs:
         id: commit_range
         run: |
           # Capture each commit on a separate line
-          echo "COMMIT_RANGE=(git log $latest_tag..HEAD --pretty=format:"- %s")" >> $GITHUB_OUTPUT
+          echo "COMMIT_RANGE=git log $latest_tag..HEAD --pretty=format:"- %s"" >> $GITHUB_OUTPUT
       - name: Create an issue
         env:
           COMMIT_RANGE: ${{steps.commit_range.outputs.COMMIT_RANGE}}
