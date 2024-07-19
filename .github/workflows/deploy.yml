@@ -1,7 +1,7 @@
 name: deploy
 on: [workflow_dispatch]
 jobs:
-  testing:
+  test-lint:
     runs-on: ubuntu-latest
     steps:
       - name: get repository
@@ -10,28 +10,53 @@ jobs:
         run: npm ci
       - name: run tests
         run: npm run test
-  lint:
-    runs-on: ubuntu-latest
-    needs: testing
-    steps:
-      - name: get repository
-        uses: actions/checkout@v4
-      - name: setup dependencies
-        run: npm ci
       - name: run lint
         run: npm run lint
   Checkout-branch:
     runs-on: ubuntu-latest
-    needs: lint
+    needs: test-lint
     steps:
       - name: get repository
         uses: actions/checkout@v4
       - name: Create release branch
         run: |
-          git checkout -b releases/${{ github.run_number }}
+          git checkout -b releases/v${{ github.run_number }}
+                    git push origin releases/v${{ github.run_number }}
+      - name: Create tag
+        run: |
+          git checkout main
+          git tag v${{ github.run_number }}
+          git push origin v${{ github.run_number }}
+      - name: Get previous release tag
+        id: previous_tag
+        run: |
+          echo "::set-output name=previous_tag::$(git describe --abbrev=0 --tags --match 'v*')"
+      - name: Get release commit range
+        id: commit_range
+        run: |
+          echo "::set-output name=commit_range::$(git log --pretty=format:'%h %s' --abbrev-commit --no-merges ${{ steps.previous_tag.outputs.previous_tag }}..HEAD)"
+
+      - name: Create Issue
+        uses: actions/create-issue@v3
+        with:
+          title: Release v${{ github.run_number }}
+          body: |
+            ## Release Information
+            - *Author:* ${{ github.actor }}
+            - *Version:* ${{ github.run_number }}
+            - *Commits:*
+              ${{ steps.commit_range.outputs.commit_range }}
+            - *Docker Image:* cr.yandex/<идентификатор_реестра>/app:v${{ github.run_number }}
+
+      - name: Update CHANGELOG
+        run: |
+          echo "## v${{ github.run_number }}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "${{ steps.commit_range.outputs.commit_range }}" >> CHANGELOG.md
+
   Build-and-push-image-to-Yandex-Cloud-Container-Registry:
     runs-on: ubuntu-latest
-    needs: lint
+    needs: test-lint
     steps:
       - name: get repository
         uses: actions/checkout@v4
