@@ -37,7 +37,7 @@ jobs:
           echo "::set-output name=commit_range::$(git log --pretty=format:'%h %s' --abbrev-commit --no-merges ${{ steps.previous_tag.outputs.previous_tag }}..HEAD)"
 
       - name: Create an issue
-        uses: dacbd/create-issue-action@main
+        uses: dacbd/create-issue-action@releases
         with:
           token: ${{ github.token }}
           title: Release v${{github.run_number}}
