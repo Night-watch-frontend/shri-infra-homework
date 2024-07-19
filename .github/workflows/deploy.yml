@@ -30,12 +30,12 @@ jobs:
       - name: Get previous release tag
         id: previous_tag
         run: |
-          echo "::set-output name=previous_tag::$(git describe --abbrev=0 --tags --match 'v*')"
+          echo "PREVIOUS_TAG=$(git describe --abbrev=0 --tags --match 'v*')" >> $GITHUB_ENV
       - name: Get release commit range
         id: commit_range
         run: |
           # Capture each commit on a separate line
-          git log --pretty=format:'- %h %s' --abbrev-commit --no-merges ${{ steps.previous_tag.outputs.previous_tag }}..HEAD > $GITHUB_ENV/COMMIT_RANGE
+          git log --pretty=format:'- %h %s' --abbrev-commit --no-merges ${{ env.PREVIOUS_TAG }}..HEAD >> $GITHUB_WORKSPACE/COMMIT_RANGE
       - name: Create an issue
         uses: dacbd/create-issue-action@main
         with:
