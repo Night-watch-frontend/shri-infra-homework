@@ -31,6 +31,12 @@ jobs:
         id: previous_tag
         run: |
           echo "PREVIOUS_TAG=$(git describe --always --tags --match 'v*' HEAD^)" >> $GITHUB_ENV
+      - name: Get release commit range
+        id: commit_range
+        run: |
+          # Capture each commit on a separate line
+          git log $latest_tag..HEAD --pretty=format:"- %s"..HEAD > COMMIT_RANGE
+          echo "COMMIT_RANGE=(git log $latest_tag..HEAD --pretty=format:"- %s")" >> $GITHUB_OUTPUT
       - name: Create an issue
         uses: dacbd/create-issue-action@main
         with:
@@ -41,7 +47,7 @@ jobs:
              - *Author:* ${{ github.actor }}
             - *Version:* ${{ github.run_number }}
             - *Commits:*
-            git log $latest_tag..HEAD --pretty=format:"- %s"
+            ${{ steps.commit_range.outputs.COMMIT_RANGE }}
             - *Docker Image:* cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:v${{ github.run_number }}
 
       - name: Update CHANGELOG
