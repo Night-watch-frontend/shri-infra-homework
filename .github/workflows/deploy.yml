@@ -27,10 +27,6 @@ jobs:
           git checkout main
           git tag v${{ github.run_number }}
           git push origin v${{ github.run_number }}
-      - name: Get previous release tag
-        id: previous_tag
-        run: |
-          echo "PREVIOUS_TAG=$(git describe --always --tags --match 'v*' HEAD^)" >> $GITHUB_ENV
       - name: Get release commit range
         id: commit_range
         run: |
@@ -47,7 +43,7 @@ jobs:
              - *Author:* ${{ github.actor }}
             - *Version:* ${{ github.run_number }}
             - *Commits:*
-            ${{ steps.commit_range.outputs.COMMIT_RANGE }}
+            ${{ env.COMMIT_RANGE }}
             - *Docker Image:* cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:v${{ github.run_number }}
 
       - name: Update CHANGELOG
