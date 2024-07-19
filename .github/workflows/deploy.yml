@@ -31,7 +31,6 @@ jobs:
         id: commit_range
         run: |
           # Capture each commit on a separate line
-          git log $latest_tag..HEAD --pretty=format:"- %s"..HEAD > COMMIT_RANGE
           echo "COMMIT_RANGE=(git log $latest_tag..HEAD --pretty=format:"- %s")" >> $GITHUB_OUTPUT
       - name: Create an issue
         uses: dacbd/create-issue-action@main
@@ -50,7 +49,7 @@ jobs:
         run: |
           echo "## v${{ github.run_number }}" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
-          echo "${{ steps.commit_range.outputs.commit_range }}" >> CHANGELOG.md
+          echo "${{ env.COMMIT_RANGE }}" >> CHANGELOG.md
 
   Build-and-push-image-to-Yandex-Cloud-Container-Registry:
     runs-on: ubuntu-latest
