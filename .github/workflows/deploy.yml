@@ -34,8 +34,7 @@ jobs:
       - name: Get release commit range
         id: commit_range
         run: |
-          echo "::set-output name=commit_range::$(git log --pretty=format:'%h %s' --abbrev-commit --no-merges ${{ steps.previous_tag.outputs.previous_tag }}..HEAD)"
-
+          echo "COMMIT_RANGE=$(git log --pretty=format:'%h %s' --abbrev-commit --no-merges ${{ steps.previous_tag.outputs.previous_tag }}..HEAD)" >> $GITHUB_ENV
       - name: Create an issue
         uses: dacbd/create-issue-action@main
         with:
@@ -46,8 +45,8 @@ jobs:
              - *Author:* ${{ github.actor }}
             - *Version:* ${{ github.run_number }}
             - *Commits:*
-            ${{ steps.commit_range.outputs.commit_range }}
-            - *Docker Image:* cr.yandex/<идентификатор_реестра>/app:v${{ github.run_number }}
+            ${{ env.COMMIT_RANGE }}
+            - *Docker Image:* cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:v${{ github.run_number }}
 
       - name: Update CHANGELOG
         run: |
@@ -69,9 +68,7 @@ jobs:
 
       - name: Build, tag, and push image to Yandex Cloud Container Registry
         env:
-          CR_REGISTRY: crp54rf5t5acteh3vcdt
-          CR_REPOSITORY: shri-infra
           IMAGE_TAG: ${{ github.run_number }}
         run: |
-          docker build -t cr.yandex/${{env.CR_REGISTRY}}/${{env.CR_REPOSITORY}}:${{env.IMAGE_TAG}} -t cr.yandex/${{env.CR_REGISTRY}}/${{env.CR_REPOSITORY}}:${{env.IMAGE_TAG}}_latest -f ./Dockerfile.shir-infra .
-          docker push cr.yandex/${{env.CR_REGISTRY}}/${{env.CR_REPOSITORY}} --all-tags
+          docker build -t cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:${{env.IMAGE_TAG}} -t cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:${{env.IMAGE_TAG}}_latest -f ./Dockerfile.shir-infra .
+          docker push cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}} --all-tags
