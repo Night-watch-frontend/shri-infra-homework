@@ -46,7 +46,7 @@ jobs:
              - *Author:* ${{ github.actor }}
             - *Version:* ${{ github.run_number }}
             - *Commits:*
-            (cat $GITHUB_WORKSPACE/COMMIT_RANGE)
+            $(cat ${{ github.workspace }}/COMMIT_RANGE)
             - *Docker Image:* cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:v${{ github.run_number }}
 
       - name: Update CHANGELOG
