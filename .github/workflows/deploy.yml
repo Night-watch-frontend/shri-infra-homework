@@ -48,4 +48,4 @@ jobs:
           IMAGE_TAG: ${{ github.run_number }}
         run: |
           docker build -t cr.yandex/${{env.CR_REGISTRY}}/${{env.CR_REPOSITORY}}:${{env.IMAGE_TAG}} -t cr.yandex/${{env.CR_REGISTRY}}/${{env.CR_REPOSITORY}}:${{env.IMAGE_TAG}}_latest -f ./Dockerfile.shir-infra .
-          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG_latest --push-tag cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+          docker push cr.yandex/${{env.CR_REGISTRY}}/${{env.CR_REPOSITORY}} --all-tags
