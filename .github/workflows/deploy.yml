@@ -36,16 +36,17 @@ jobs:
         run: |
           echo "::set-output name=commit_range::$(git log --pretty=format:'%h %s' --abbrev-commit --no-merges ${{ steps.previous_tag.outputs.previous_tag }}..HEAD)"
 
-      - name: Create Issue
-        uses: actions/create-issue@v3
+      - name: Create an issue
+        uses: dacbd/create-issue-action@main
         with:
-          title: Release v${{ github.run_number }}
+          token: ${{ github.token }}
+          title: Release v${{github.run_number}}
           body: |
-            ## Release Information
-            - *Author:* ${{ github.actor }}
+            ## Release ${{github.run_number}}: Issue:
+             - *Author:* ${{ github.actor }}
             - *Version:* ${{ github.run_number }}
             - *Commits:*
-              ${{ steps.commit_range.outputs.commit_range }}
+            ${{ steps.commit_range.outputs.commit_range }}
             - *Docker Image:* cr.yandex/<идентификатор_реестра>/app:v${{ github.run_number }}
 
       - name: Update CHANGELOG
