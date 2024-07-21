@@ -45,5 +45,5 @@ jobs:
           docker push cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}} --all-tags
       - name: Create tag
         run: |
-          git tag v${{ github.run_number }}_fix${{ github.run_number }}
-          git push origin v${{ github.run_number }}_fix${{ github.run_number }}
+          git tag v${{env.VERSION_RELISE}}_fix${{ github.run_number }}
+          git push origin v${{ env.VERSION_RELISE }}_fix${{ github.run_number }}
