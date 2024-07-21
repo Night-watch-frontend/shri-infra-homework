@@ -44,6 +44,8 @@ jobs:
           docker build -t cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:${{env.VERSION_RELISE}}_fix -t cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}}:${{env.VERSION_RELISE}}_latest -f ./Dockerfile.shir-infra .
           docker push cr.yandex/${{vars.CR_REGISTRY}}/${{vars.CR_REPOSITORY}} --all-tags
       - name: Create tag
+        env:
+          VERSION_RELISE: ${{ github.event.inputs.release_version }}
         run: |
           git tag v${{env.VERSION_RELISE}}_fix${{ github.run_number }}
           git push origin v${{ env.VERSION_RELISE }}_fix${{ github.run_number }}
